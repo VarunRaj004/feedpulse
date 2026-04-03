@@ -21,7 +21,7 @@ export interface FeedbackAnalysis {
 export async function analyzeFeedback(
   title: string,
   description: string,
-  category: string // 
+  category: string 
 ): Promise<FeedbackAnalysis> {
   const prompt = `
     You are an expert product manager analyzing customer feedback.
