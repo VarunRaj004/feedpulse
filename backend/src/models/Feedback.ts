@@ -26,11 +26,11 @@ const feedbackSchema = new Schema<IFeedback>({
     description: {
         type: String,
         required: true,
-        maxlength: 20,
+        maxlength: 2000,
     },
     category: {
         type: String,
-        enum: ["Bug", "Feature Request", "Improvement"],
+        enum: ["Bug", "Feature Request", "Improvement","Other"],
         required: true,
     },
     status: {
