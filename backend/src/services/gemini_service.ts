@@ -8,7 +8,7 @@ if (!config.geminiApiKey) {
 const genAI = new GoogleGenerativeAI(config.geminiApiKey);
 
 //Initialize the Gemini model
-export const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
+export const model = genAI.getGenerativeModel({ model: "gemini-flash-lite-latest"});
 
 export interface FeedbackAnalysis {
   category: string;

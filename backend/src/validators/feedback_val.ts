@@ -5,7 +5,7 @@ export const createFeedbackSchema = z.object({
     description: z.string().min(20).max(2000),
     category: z.enum(["Bug", "Feature Request", "Improvement"]),
     submitterName: z.string().max(50).optional(),
-    submitterEmail: z.string().email().optional().or(z.literal("")),
+    submitterEmail: z.string().max(100).optional(),
 });
 
 export type CreateFeedbackRequest = z.infer<typeof createFeedbackSchema>;
