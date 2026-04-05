@@ -3,46 +3,32 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
-export default function AdminLogin() {
+export default function LoginPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
+    setError("");
 
     try {
       const response = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(form),
       });
 
       if (response.ok) {
         const data = await response.json();
-        // Store JWT token
         localStorage.setItem("authToken", data.token);
-        // Redirect to dashboard
         router.push("/dashboard");
       } else {
-        const errorData = await response.json();
-        setError(errorData.message || "Login failed");
+        setError("Invalid email or password");
       }
-    } catch (err) {
+    } catch {
       setError("Network error. Please try again.");
     } finally {
       setLoading(false);
@@ -50,60 +36,71 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100">
-      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold mb-8 text-center">Admin Login</h1>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-gray-50 to-gray-100">
+      <div>
+        <h1 
+          className="text-4xl font-bold text-center mb-3" 
+          style={{ color: "#16a085" }}
+        >
+          Admin Login
+        </h1>
+        <p className="text-center text-gray-500 mb-10 text-sm leading-relaxed">
+          Access the dashboard to manage feedback
+        </p>
 
         {error && (
-          <div className="mb-4 p-4 bg-red-100 text-red-800 rounded-lg border border-red-400">
-            {error}
+          <div className="p-5 mb-8 rounded-lg message-error fade-in">
+            <p className="text-sm font-medium">{error}</p>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-semibold text-gray-800 mb-3">
               Email
             </label>
             <input
               type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
               required
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="admin@example.com"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              className="h-10 w-full px-5 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100 transition-all"
+              placeholder=" admin@example.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-semibold text-gray-800 mb-3">
               Password
             </label>
             <input
               type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
               required
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="••••••••"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              className="h-10 w-full px-5 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100 transition-all"
+              placeholder=" ••••••••"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            className="w-full px-6 py-3 mt-10 bg-gradient-to-r from-teal-500 to-teal-600 text-white font-semibold rounded-xl hover:from-teal-600 hover:to-teal-700 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all shadow-lg flex items-center justify-center"
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? (
+              <span className="flex items-center justify-center">
+                <span className="animate-spin mr-2">●</span> Logging in...
+              </span>
+            ) : (
+              <span>Login →</span>
+            )}
           </button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-gray-600">
-          Demo: admin@example.com / admin123
+        <p className="text-center text-xs text-gray-600 mt-8 bg-gray-50 p-4 rounded-lg">
+          <span className="font-medium text-gray-700">Demo Credentials:</span><br />
+          admin@example.com / admin123
         </p>
       </div>
     </div>

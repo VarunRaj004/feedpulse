@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 * {
   margin: 0;
@@ -13,14 +11,176 @@ html {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  color: #2c3e50;
+  background: linear-gradient(135deg, #16a085 0%, #138d75 100%);
+  min-height: 100vh;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  color: #1a5276;
+}
+
+p {
+  line-height: 1.6;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  background-color: #f8f9fa;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.slide-down {
+  animation: slideDown 0.4s ease-out;
+}
+
+/* Buttons */
+button {
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(22, 160, 133, 0.3);
+}
+
+/* Form Inputs - Enhanced Border Radius */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  transition: all 0.3s ease;
+  background-color: #f8f9fa;
+  border: 1.5px solid #ddd;
+  border-radius: 12px;
+}
+
+input[type="text"]:hover,
+input[type="email"]:hover,
+input[type="password"]:hover,
+textarea:hover,
+select:hover {
+  border-color: #16a085;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(22, 160, 133, 0.1);
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #16a085;
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(22, 160, 133, 0.12);
+  border-radius: 12px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #aaa;
+}
+
+/* Cards - Enhanced Border Radius */
+.card {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Messages - Enhanced Border Radius */
+.message-success {
+  background: linear-gradient(135deg, #d5f4e6 0%, #a9dfbf 100%);
+  color: #186a3b;
+  border-left: 4px solid #16a085;
+  border-radius: 12px;
+}
+
+.message-error {
+  background: linear-gradient(135deg, #fadbd8 0%, #f5b7b1 100%);
+  color: #78281f;
+  border-left: 4px solid #e74c3c;
+  border-radius: 12px;
+}
+
+/* Progress Bar - Enhanced Border Radius */
+.progress-bar {
+  height: 6px;
+  background: #ecf0f1;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #16a085 0%, #1abc9c 100%);
+  transition: width 0.3s ease;
+  border-radius: 8px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #16a085;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #138d75;
+}
+
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
 }

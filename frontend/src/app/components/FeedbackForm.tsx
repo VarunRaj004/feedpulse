@@ -1,210 +1,184 @@
 "use client";
 
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 
 interface FormData {
-    title:string,
-    description:string,
-    category: "Bug" | "Feature Request" | "Improvement",
-    submitterName?: string,
-    submitterEmail?: string,
+    title: string;
+    description: string;
+    category: "Bug" | "Feature Request" | "Improvement";
+    submitterName?: string;
+    submitterEmail?: string;
 }
 
-export default function FeedbackForm(){
+export default function FeedbackForm() {
     const [formData, setFormData] = useState<FormData>({
-        title:"",
-        description:"",
-        category:"Bug",
-        submitterName:"",
-        submitterEmail:"",
-    })
+        title: "",
+        description: "",
+        category: "Bug",
+        submitterName: "",
+        submitterEmail: "",
+    });
 
-    const [loading , setLoading] = useState(false)
-    const [message , setMessage] = useState<{type : "success" | "error" ; text: string} | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-        const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
-
-    const validateForm = (): string | null => {
-        if (!formData.title.trim()) return "Title is required";
-        if (formData.title.length > 120) return "Title must be under 120 characters";
-        if (!formData.description.trim()) return "Description is required";
-        if (formData.description.length < 20) return "Description must be at least 20 characters";
-        if (formData.description.length > 2000) return "Description must be under 2000 characters";
-        if (formData.submitterEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.submitterEmail)) {
-            return "Invalid email format";
-        }
-        return null;
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
-        // Client-side validation
-        const validationError = validateForm();
-        if (validationError) {
-            setMessage({ type: "error", text: validationError });
-            return;
-        }
-
         setLoading(true);
-        setMessage(null);
 
         try {
             const response = await fetch("http://localhost:5000/api/feedback", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
             });
 
             if (response.ok) {
-                setMessage({ type: "success", text: "Thank you! Your feedback has been submitted." });
-                setFormData({
-                    title: "",
-                    description: "",
-                    category: "Bug",
-                    submitterName: "",
-                    submitterEmail: "",
-                });
+                setMessage({ type: "success", text: "✓ Feedback submitted successfully!" });
+                setFormData({ title: "", description: "", category: "Bug", submitterName: "", submitterEmail: "" });
+                setTimeout(() => setMessage(null), 4000);
             } else {
-                const error = await response.json();
-                setMessage({ type: "error", text: error.error || "Failed to submit feedback" });
+                setMessage({ type: "error", text: "Failed to submit feedback. Please try again." });
             }
-        } catch (error) {
-            setMessage({ type: "error", text: "Network error. Please try again." });
+        } catch {
+            setMessage({ type: "error", text: "Network error. Please check your connection." });
         } finally {
             setLoading(false);
         }
     };
 
     const descriptionLength = formData.description.length;
-    const descriptionLimit = 2000;
+    const progressPercent = (descriptionLength / 2000) * 100;
 
     return (
-        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-            <h1 className="text-3xl font-bold mb-6">Submit Your Feedback</h1>
-
-            {message && (
-                <div
-                    className={`mb-4 p-4 rounded-lg ${
-                        message.type === "success"
-                            ? "bg-green-100 text-green-800 border border-green-400"
-                            : "bg-red-100 text-red-800 border border-red-400"
-                    }`}
-                >
-                    {message.text}
-                </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Title */}
+        <div className="min-h-screen py-16 px-2 flex items-center justify-center">
+            <div className="w-full max-w-4xl fade-in">
+                {/* Card with Enhanced Border Radius - Expanded */}
                 <div>
-                    <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                        Title <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        id="title"
-                        name="title"
-                        value={formData.title}
-                        onChange={handleChange}
-                        placeholder="Brief title of your feedback"
-                        maxLength={120}
-                        className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">{formData.title.length}/120</p>
-                </div>
+                    {/* Title */}
+                    <h1 className="text-5xl font-bold text-center mb-4" style={{ color: "#16a085" }}>
+                        Feedback Form
+                    </h1>
+                    <p className="text-center text-gray-500 mb-12 text-base leading-relaxed">
+                        Help us improve by sharing your feedback
+                    </p>
 
-                {/* Description */}
-                <div>
-                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                        Description <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                        id="description"
-                        name="description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        placeholder="Detailed description (at least 20 characters)"
-                        rows={5}
-                        maxLength={2000}
-                        className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                        <span>Minimum 20 characters</span>
-                        <span>
-                            {descriptionLength}/{descriptionLimit}
-                        </span>
-                    </div>
-                </div>
+                    {/* Alert Messages */}
+                    {message && (
+                        <div className={`p-5 mb-10 fade-in ${
+                            message.type === "success" ? "message-success" : "message-error"
+                        }`}>
+                            <p className="font-medium">{message.text}</p>
+                        </div>
+                    )}
 
-                {/* Category */}
-                <div>
-                    <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-                        Category <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                        id="category"
-                        name="category"
-                        value={formData.category}
-                        onChange={handleChange}
-                        className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                        <option value="Bug">Bug Report</option>
-                        <option value="Feature Request">Feature Request</option>
-                        <option value="Improvement">Improvement Suggestion</option>
-                    </select>
-                </div>
+                    <form onSubmit={handleSubmit} className="space-y-10">
+                        {/* Title Field */}
+                        <div>
+                            <label className="block text-base font-semibold text-gray-800 mb-5">
+                                Title
+                            </label>
+                            <input
+                                type="text"
+                                required
+                                maxLength={120}
+                                value={formData.title}
+                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                className="h-10 w-full px-8 py-6 text-base focus:outline-none"
+                                placeholder=" Enter feedback title"
+                            />
+                        </div>
+                        {/* Name Field */}
+                        <div>
+                            <label className="block text-base font-semibold text-gray-800 pb-20 ">
+                                Name <span className="font-normal text-gray-500">(optional)</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={formData.submitterName}
+                                onChange={(e) => setFormData({ ...formData, submitterName: e.target.value })}
+                                maxLength={50}
+                                className="h-10 w-full px-8 py-6 text-base focus:outline-none"
+                                placeholder=" Your name"
+                            />
+                        </div>
 
-                {/* Submitter Name */}
-                <div>
-                    <label htmlFor="submitterName" className="block text-sm font-medium text-gray-700">
-                        Your Name (Optional)
-                    </label>
-                    <input
-                        type="text"
-                        id="submitterName"
-                        name="submitterName"
-                        value={formData.submitterName}
-                        onChange={handleChange}
-                        placeholder="Your name"
-                        maxLength={50}
-                        className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                </div>
 
-                {/* Submitter Email */}
-                <div>
-                    <label htmlFor="submitterEmail" className="block text-sm font-medium text-gray-700">
-                        Your Email (Optional)
-                    </label>
-                    <input
-                        type="email"
-                        id="submitterEmail"
-                        name="submitterEmail"
-                        value={formData.submitterEmail}
-                        onChange={handleChange}
-                        placeholder="your.email@example.com"
-                        className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                </div>
+                        {/* Email Field */}
+                        <div>
+                            <label className="block text-base font-semibold text-gray-800 mb-5">
+                                Email <span className="font-normal text-gray-500">(optional)</span>
+                            </label>
+                            <input
+                                type="email"
+                                value={formData.submitterEmail}
+                                onChange={(e) => setFormData({ ...formData, submitterEmail: e.target.value })}
+                                className="h-10 w-full px-8 py-6 text-base focus:outline-none"
+                                placeholder=" your.email@example.com"
+                            />
+                        </div>
 
-                {/* Submit Button */}
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-                >
-                    {loading ? "Submitting..." : "Submit Feedback"}
-                </button>
-            </form>
+                        {/* Subject (Category) */}
+                        <div>
+                            <label className="block text-base font-semibold text-gray-800 mb-5">
+                                Category
+                            </label>
+                            <select
+                                value={formData.category}
+                                onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
+                                className="h-10 w-full px-8 py-6 text-base focus:outline-none"
+                            >
+                                <option value="Bug">Bug</option>
+                                <option value="Feature Request">Feature Request</option>
+                                <option value="Improvement">Improvement</option>
+                            </select>
+                        </div>
+
+                        {/* Message (Description) */}
+                        <div>
+                            <label className="block text-base font-semibold text-gray-800 mb-5">
+                                Message
+                            </label>
+                            <textarea
+                                required
+                                minLength={20}
+                                maxLength={2000}
+                                rows={9}
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                className="w-full px-8 py-6 text-base focus:outline-none resize-none"
+                                placeholder=" Enter your detailed feedback..."
+                            />
+                            <div className="mt-5">
+                                <div className="progress-bar mb-4">
+                                    <div className="progress-fill" style={{ width: `${progressPercent}%` }}></div>
+                                </div>
+                                <div className="flex justify-between text-sm text-gray-600">
+                                    <span>{descriptionLength < 20 ? `${20 - descriptionLength} more characters needed` : "✓ Ready to submit"}</span>
+                                    <span>{descriptionLength}/2000</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Name Field */}
+
+                        <button
+                            type="submit"
+                            disabled={loading || formData.description.length < 20}
+                            className="h-10 w-full px-6 py-6 mt-12 bg-gradient-to-r from-teal-500 to-teal-600 text-white font-semibold rounded-xl hover:from-teal-600 hover:to-teal-700 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all shadow-lg flex items-center justify-center text-lg"
+                            style={{ borderRadius: "14px" }}
+                        >
+                            {loading ? (
+                                <span className="flex items-center">
+                                    <span className="animate-spin mr-3">●</span> Submitting...
+                                </span>
+                            ) : (
+                                <span>Submit →</span>
+                            )}
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     );
 }

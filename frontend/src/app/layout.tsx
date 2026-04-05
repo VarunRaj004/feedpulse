@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "FeedPulse - Product Feedback Platform",
+  title: "FeedPulse",
   description: "Submit and track product feedback with AI-powered analysis",
 };
 
