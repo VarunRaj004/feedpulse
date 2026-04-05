@@ -2,6 +2,7 @@ import {Request , Response} from "express";
 import {Feedback} from "../models/Feedback.js";
 import { createFeedbackSchema } from "../validators/feedback_val.js";
 import { analyzeFeedback } from "../services/gemini_service.js";
+import { ZodError } from "zod";
 
 
 export async function createFeedback(req: Request , res : Response){
@@ -32,9 +33,31 @@ export async function createFeedback(req: Request , res : Response){
         });
 
         await feedback.save();
-        res.status(201).json(feedback);
+        res.status(201).json({
+            success: true,
+            message: "Feedback submitted successfully",
+            data: {
+                id: feedback._id,
+                title: feedback.title,
+                ai_sentiment: feedback.ai_sentiment,
+                ai_priority: feedback.ai_priority,
+            },
+        });
     } catch (error) {
         console.error("Error creating feedback:", error);
-        res.status(400).json({ error: "Invalid feedback data" });
+                if (error instanceof ZodError) {
+            res.status(400).json({ 
+                success: false,
+                message: "Validation error",
+                errors: error.issues 
+            });
+            return;
+        }
+
+        res.status(500).json({ 
+            success: false,
+            message: "Failed to submit feedback",
+            code: "FEEDBACK_CREATION_ERROR"
+        });
     }
 }
